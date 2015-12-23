@@ -1,0 +1,63 @@
+div:focus { outline: 0; }
+div[contenteditable] { margin: 0 0 0 -3rem; padding: 0 0 0 2rem; border-left: 1rem solid #333; background: rgba(0,0,0,.05); white-space: pre-wrap; }
+
+html { font-size: 18px; }
+body { background: #f9f3f3; color: #000; font: normal 1em/1.4em "Palatino Linotype", "Book Antiqua", Palatino, serif; }
+.markdown { word-wrap: break-word; width: 720px; max-width: 100%; margin: 0 auto; padding: 3rem; }
+
+.markdown strong { font-weight: bold; }
+.markdown img { border: 0; max-width: 100%; }
+
+.markdown table { display: block; width: 100%; overflow: auto; word-break: normal; word-break: keep-all; margin: 1rem 0; border-collapse: collapse; border-spacing: 0; }
+.markdown td,
+.markdown th { padding: .5rem 1rem; border: 1px solid #000; text-align: left; border-top: 1px solid #000; }
+.markdown th { font-weight: bold; background: #000; color: #fff; }
+
+.markdown a { color: #4183c4; text-decoration: none; }
+.markdown a:hover,
+.markdown a:active { text-decoration: underline; }
+
+.markdown hr { height: .2rem; padding: 0; margin: 1rem 0; background: #000; border: 0 none; }
+.markdown hr:before { display: table; content: ""; }
+.markdown hr:after { display: table; clear: both; content: ""; }
+
+.markdown p { margin: 1rem 0; }
+
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4,
+.markdown h5,
+.markdown h6 { margin: 2rem 0 1rem; line-height: 140%; }
+
+.markdown h1 { font-size: 3rem; }
+.markdown h2 { font-size: 1.75rem; }
+.markdown h3 { font-size: 1.5rem; }
+.markdown h4 { font-size: 1.25rem; }
+.markdown h5,
+.markdown h6 { font-size: 1rem; }
+
+.markdown blockquote { position: relative; padding: 0 1rem; border-left: .5rem solid #000; }
+.markdown blockquote>:first-child { margin-top: 0; }
+.markdown blockquote>:last-child { margin-bottom: 0; }
+
+
+.markdown ul,
+.markdown ol { padding: 0; margin: 1em 0; padding-left: 2rem; }
+.markdown ol ol,
+.markdown ul ol { list-style-type: lower-roman; }
+.markdown ul ul ol,
+.markdown ul ol ol,
+.markdown ol ul ol,
+.markdown ol ol ol { list-style-type: lower-alpha; }
+.markdown li > p { margin-top: 1rem; }
+
+.markdown dl { margin: 1rem 0; padding: 0; }
+.markdown dl dt { padding: 0; margin-top: 1rem; font-style: italic; font-weight: bold; }
+.markdown dl dd { padding: 0 1rem; margin: 0 0 1rem; }
+
+.markdown code { font-family: monospace, monospace; padding: .2rem 0; margin: 0; background: #000; color: #fff; padding: 0 .3em; }
+.markdown pre { margin: 1rem 0; font: .9rem monospace, monospace; padding: 1rem; background: #000; color: #fff; overflow: auto; }
+.markdown pre code { background: 0; padding: 0; }
+
+.markdown > div:first-child > *:first-child { margin-top: 0; }
