@@ -1,42 +1,63 @@
-/*
-Bei Tab wirklich Tab einfügen
-Entfernen-Taste am Ende sollte funktionieren
-Cursor-Tasten sollten funktionieren
-Event-Delegation mit Hören auf DIV kann schief gehen bei handgeschriebenem DIV
-Klick außerhalb des Views sollte Editor aufhören lassen
-Warum gehen Code-Blöcke nur einmal?
-Der Zähler für Zeichen in Block zählt schräg? (Ablösen durch Funktion zum Abfragen der letzten Zeile)
-*/
+// TODO: after tab key we have the wrong cursor position
+// TODO: API for getRaw(), getRendered()
+// TODO: Markdown footnotes do not work
 
-function Editor(view, input) {
-	marked.setOptions({
-	  renderer: new marked.Renderer(),
-	  gfm: true,
-	  tables: true,
-	  breaks: true,
-	  pedantic: false,
-	  sanitize: false,
-	  smartLists: true,
-	  smartypants: false
-	});
+function Editor(view, input, renderer_callback) {
+	// the index of the currently edited block 
+	var current_index;
+	
+	// the position of the cursor before the current position
+	var cursor_position_last = null;
+	
+	(function _init() {
+		// trim input
+		input = _clean(input);
 
-	var obj							= this;
-	var text_position_last			= null;
-	var text_position_in_line_last	= null;
+		if (input === '') {
+			input = 'Start writing here ...';
+		}
+	
+		// split input into clean chunks
+		chunks = input.split('\n\n');
 
-	// initial split of markdown text: split into chunks
-	input = input.replace(/\n\s+\n/g, "\n\n").split("\n\n");
+		// remove content from view element
+		view.innerHTML = '';
 
-	input.forEach(function(item, key){
-		var block = document.createElement('div');
-		view.appendChild(block);
-		block.markdown = item;
-		preview(key);
-	});
+		// create a div for every chunk and save the text in the markdown attribute 
+		chunks.forEach(function(text, index){
+			var div = document.createElement('div');
+			div.markdown = text;
+			view.appendChild(div);
+			_render(index);
+		});
 
-	// adds native event delegation
-	HTMLElement.prototype.addEventDelegation = function(target, event, callback){
-		this.addEventListener(event, function(e){
+		// edit on click
+		_addEventDelegation(view, 'DIV', 'click', function(){
+			_startEditing(_domIndexOf(this));
+		});
+		
+		// render on focusout
+		_addEventDelegation(view, 'DIV', 'focusout', function(){
+			_render(_domIndexOf(this));
+		});
+		
+		// move with the cursor on keydown
+		_addEventDelegation(view, 'DIV', 'keydown', _move);
+	
+		// edit the content on keyup
+		_addEventDelegation(view, 'DIV', 'keyup', _edit);
+	})();
+	
+	function _render(index) {
+		var block = view.children[index];
+		block.removeAttribute('contenteditable');
+		block.markdown = _clean(block.markdown);
+		block.innerHTML = renderer_callback(block.markdown);
+	}
+
+	// add an event delegation helper
+	function _addEventDelegation(element, target, event, callback){
+		element.addEventListener(event, function(e){
 			element = e.target;
 
 			while (element.nodeName !== target) {
@@ -49,153 +70,163 @@ function Editor(view, input) {
 		});
 	}
 
-	function getCaretPositionInLine(element) {
-		return window.getSelection().baseOffset;
-	};
+	// an indexOf helper for dom elements
+	function _domIndexOf(element) {
+		return Array.prototype.indexOf.call(element.parentNode.children, element);
+	}
 
-	function getCaretLineIn(element) {
-		return 25543543;
-		return window.getSelection().baseOffset;
-	};
-
+	function _clean(string) {
+		return string.replace(/\r/g, '').replace(/\n\s+\n/g, '\n\n').replace(/(^\n+|\n+$)/g, '');
+	}
+	
 	// returns the position of the cursor within a contenteditable field that also includes html elements
-	function getCaretPositionIn(element) {
-		var caretOffset = 0;
+	function _getCursorPosition(element) {
 		var sel = window.getSelection();
+		if (sel.rangeCount === 0) return 0;
 
-		if (sel.rangeCount > 0) {
-			var range = sel.getRangeAt(0);
-			var preCaretRange = range.cloneRange();
-			preCaretRange.selectNodeContents(element);
-			preCaretRange.setEnd(range.endContainer, range.endOffset);
-			caretOffset = preCaretRange.toString().length;
-		}
-		return caretOffset;
+		var range = sel.getRangeAt(0);
+		var preCaretRange = range.cloneRange();
+		preCaretRange.selectNodeContents(element);
+		preCaretRange.setEnd(range.endContainer, range.endOffset);
+		var position = preCaretRange.toString().length;
+		return position;
 	};
 
-	function getIndexOfCurrentContenteditable() {
-		var length = view.childNodes.length;
-		while (length--) {
-			if (view.childNodes[length].hasAttribute('contenteditable')) return length;
-		}
+	// set the cursor position in the currently active element
+	function _setCursorPosition(position) {
+		var sel = window.getSelection();
+		if (sel.rangeCount === 0) return;
 
-		return false;
+		var range = sel.getRangeAt(0);
+		range.setStart(range.startContainer, position);
+		range.collapse(true);
+		sel.removeAllRanges();
+		sel.addRange(range);
+	};
+
+	function _insertAtCursorPosition(string) {
+		var sel = window.getSelection();
+		if (sel.rangeCount === 0) return 0;
+
+		var range = sel.getRangeAt(0);
+		var text = document.createTextNode(string);
+		range.insertNode(text);
 	}
-
-	function getIndex(element, parent) {
-		var index = parent.childNodes.length;
-		while (index--) {
-			if (parent.childNodes[index] == element) return index;
-		}
-
-		return false;
-	}
-
-	function edit(index) {
-		var block = view.childNodes[index];
+	
+	function _startEditing(index) {
+		current_index = Math.min(view.children.length-1, Math.max(0, index));
+		var block = view.children[current_index];
+		if (block.hasAttribute('contenteditable')) return false;
+		
 		block.setAttribute('contenteditable', true);
 		block.textContent = block.markdown;
 		block.focus();
 	}
 
-	function preview(index) {
-		var block = view.childNodes[index];
-		block.removeAttribute('contenteditable');
-		block.innerHTML = marked(block.markdown);
-	}
+	function _move(e) {
+		var block			= this;
+		var cursor_position	= _getCursorPosition(block);
+		var text_length		= block.textContent.length;
 
-	view.addEventDelegation('DIV', 'click', function(e){
-		var index = getIndex(this, view);
+		// "tab"
+		if (e.keyCode === 9) {
+			_insertAtCursorPosition('\t');
+			_setCursorPosition(cursor_position);
+			block.markdown = block.innerText;
+			e.preventDefault();
+			return false;
 
-		// at click on an between the containers, return ...
-		if (index === false) return true;
+		// "up" or "left" at the first position
+		} else if ((e.keyCode === 38 || e.keyCode === 37) && cursor_position === 0 && cursor_position_last === 0) {
+			_startEditing(current_index-1);
 
-		// click on the current active should do nothing
-		if (getIndexOfCurrentContenteditable() === index) return true;
+			_setCursorPosition(view.children[current_index].markdown.length);
+			e.preventDefault();
+			return false;
 
-		edit(index);
-	});
-	view.addEventDelegation('DIV', 'focusout', function(e){
-		var index = getIndex(this, view);
-		preview(index);
-	});
-	view.addEventDelegation('DIV', 'keydown', function(e){
-		var block					= this;
-		var current					= getIndexOfCurrentContenteditable();
-		var keycode					= e.keyCode;
-		var text_position			= getCaretPositionIn(block);
-		var text_position_in_line	= getCaretPositionInLine(block);
-		var text_length				= block.textContent.replace(/(\r\n|\n)/g, "").length;
-		var line					= getCaretLineIn(block);
-
-		console.log({keycode: keycode, position: text_position + '/' + text_length, line: line, position_in_line: text_position_in_line, position_last: text_position_last});
-
-		// "up" key or
-		if (keycode === 38 && text_position === 0 && text_position_last === 0) {
-			edit(current-1);
-
-		// "left" at the beginning
-		} else if (keycode === 37 && text_position === 0 && text_position_last === 0) {
-			edit(current-1);
-			window.getSelection().modify('move', 'right', 'documentboundary');
-
-	 	// "down" or
-		} else if (keycode === 40 && text_position === text_length) {
-			edit(current+1);
+		// "down" or
+		} else if (e.keyCode === 40 && cursor_position === text_length) {
+			_startEditing(current_index+1);
+			e.preventDefault();
+			return false;
 
 		// "right" key at the end
-		} else if (keycode === 39 && text_position === text_length && text_position_last === text_position) {
-			edit(current+1);
+		} else if (e.keyCode === 39 && cursor_position === text_length && cursor_position_last === cursor_position) {
+			_startEditing(current_index+1);
+			e.preventDefault();
+			return false;
+	
+		// "ctrl+up"
+		} else if (e.ctrlKey && e.keyCode === 38) {
+			_startEditing(current_index-1);
+			e.preventDefault();
+			return false;
+			
+		// "ctrl+down"
+		} else if (e.ctrlKey && e.keyCode === 40) {
+			_startEditing(current_index+1);
+			e.preventDefault();
+			return false;
+			
+		// prevent "enter" at the first position (doesn't make sense)
+		} else if (e.keyCode === 13 && cursor_position === 0) {
+			e.preventDefault();
+			return false;
 		}
+	}
+	
+	function _edit(e) {
+		var block			= this;
+		var cursor_position	= _getCursorPosition(block);
+		var text_length		= block.textContent.length;
 
-	});
-	view.addEventDelegation('DIV', 'keyup', function(e){
-		var block					= this;
-		var current					= getIndexOfCurrentContenteditable();
-		var keycode					= e.keyCode;
-		var text_position			= getCaretPositionIn(block);
-		var text_position_in_line	= getCaretPositionInLine(block);
-		var text_length				= block.textContent.replace(/(\r\n|\n)/g, "").length;
-		var line					= getCaretLineIn(block);
-
-		//console.log({keycode: keycode, position: text_position + '/' + text_length, line: line, position_in_line: text_position_in_line, position_last: text_position_last});
-
-		// save Content
+		// save Content (do not use textContent otherwise we would have problems to extend a block via "enter")
 		block.markdown = block.innerText;
 
-		if (keycode === 27) {
-			var already_in_edit = getIndexOfCurrentContenteditable();
-			preview(already_in_edit);
+		// "escape"
+		if (e.keyCode === 27) {
+			_render(current_index);
 
 		 // "backspace" key at the beginning
-		} else if (keycode === 8 && text_position === 0) {
+		} else if (e.keyCode === 8 && cursor_position === 0 && cursor_position_last === 0) {
 			// add the current content to the block before
-			view.childNodes[current-1].markdown += "\n" + block.markdown;
+			var old_length = view.children[current_index-1].markdown.length;
+			view.children[current_index-1].markdown += "\n" + block.markdown;
 
 			// remove block
 			view.removeChild(block);
 
-			edit(current-1);
+			_startEditing(current_index-1);
+			_setCursorPosition(old_length+1);
 
 		// "del" key
-		} else if (keycode === 46 && text_position === text_length) {
+		} else if (e.keyCode === 46 && cursor_position === text_length) {
 			// add the next content to the current block
-			var text = document.createTextNode("\n" + view.childNodes[current+1].markdown);
+			var text = document.createTextNode("\n" + view.children[current_index+1].markdown);
 			block.appendChild(text);
-			block.markdown += "\n" + view.childNodes[current+1].markdown;
+			block.markdown += "\n" + view.children[current_index+1].markdown;
 
 			// remove block
-			view.removeChild(view.childNodes[current+1]);
+			view.removeChild(view.children[current_index+1]);
 
 		// "return" key
-		} else if (keycode === 13) {
+		} else if (e.keyCode === 13) {
 			// check if there are now multiple blocks
-			var parts = block.markdown.split("\n\n");
-			console.log(parts);
+			if (matches = block.markdown.match(/\n\n([^$])/)) {
+				var parts = block.markdown.split(matches[0]);
+				if (parts.length > 1) {
+					block.markdown = parts[0];
+					_render(current_index);
 
+					current_index++;
+					var div = document.createElement('div');
+					div.markdown = matches[1] + parts[1];
+					block.parentNode.insertBefore(div, block.nextSibling);
+					_startEditing(current_index);
+				}
+			}
 		}
 
-		text_position_last = text_position;
-		text_position_in_line_last = text_position_in_line;
-	});
+		cursor_position_last = cursor_position;
+	}
 }

@@ -2,13 +2,14 @@
 <html>
 <head>
 	<title>
+		Markdown inline editor
 	</title>
 
-	<link href="markdown.css" rel="stylesheet"></link>
+	<link href="markdown.css" rel="stylesheet" />
 </head>
 <body>
 
-<textarea id="textarea">
+<article class="markdown">
 # An exhibit of Markdown
 
 This note demonstrates some of what [Markdown][1] is capable of doing.
@@ -102,16 +103,33 @@ There's actually a lot more to Markdown than this. See the official [introductio
 |green   |  Leaves, grass, frogs
 |        |  and other things it's
 |        |  not easy being.
-</textarea>
-<div class="markdown" id="markdown"></div>
+</article>
 
+<!--
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js"></script>
-<script src="editor.js"></script>
+-->
+<script src="marked.min.js"></script>
 <script>
-var textarea = document.getElementById('textarea');
-var markdown = document.getElementById('markdown');
-markdown.editor = new Editor(markdown, textarea.value);
-textarea.style.display = 'none';
+// initialize marked markdown renderer
+marked.setOptions({
+	renderer: new marked.Renderer(),
+	gfm: true,
+	tables: true,
+	breaks: true,
+	pedantic: false,
+	sanitize: false,
+	smartLists: true,
+	smartypants: false
+});
+</script>
+
+<script src="editor.js"></script>
+<script>	
+var view = document.querySelector('.markdown');
+var content = view.textContent;
+var editor = new Editor(view, content, function(markdown) {
+	return marked(markdown);
+});
 </script>
 
 </body>
