@@ -5,82 +5,115 @@
 		Markdown inline editor
 	</title>
 
-	<link href="markdown.css" rel="stylesheet" />
+	<link id="link_styler" href="github.css" rel="stylesheet" />
+	<style>
+	#debug { position: fixed; top: 0; left: 0; width: 400px; font: normal 12px/12px 'Courier New' }
+	#styler { background: rgba(0,0,0,.1); padding: 5px 20px; margin: 0 0 10px 0; }
+
+	div[contenteditable] { white-space: pre-wrap; }
+	</style>
+
+	<script>
+		window.addEventListener('load', function(){
+			$select = document.querySelector('#styler select');
+			$select.addEventListener('change', function(){
+				console.log($select.value);
+				document.querySelector('#link_styler').href = $select.value;
+			});
+		});
+	</script>
 </head>
 <body>
 
+<div id="debug"></div>
+<script>
+function d() {
+	var node = document.createElement('pre');
+	node.style.borderTop = '1px solid #ccc';
+	node.style.whiteSpace = 'pre-wrap';
+	node.textContent += JSON.stringify(arguments);
+
+	var $debug = document.querySelector('#debug');
+	$debug.appendChild(node);
+
+	if ($debug.children.length > 10) {
+		$debug.removeChild($debug.firstChild);
+	}
+}
+</script>
+
+<div id="styler">
+	Choose a style:
+	<select>
+		<option value="github.css">Github</option>
+		<option value="markdown.css">Book</option>
+	</select>
+</div>
+
 <article class="markdown">
 # Markdown Inline Editor
-	
-**A new approach of editing markdown text with the preview and the editing area combined.**
+
+**A new lightweight approach of editing markdown text with the preview and the editing area combined.**
 
 The text you are reading at this moment can be edited. Just click at the text you want to edit and you will see the way it does look and feel.
 
-Do not search for special keyboard shortcuts. Think as you would edit plan text.
-So to merge **block 1** and **block 2**, press `del` at the end of **block 1** or `backspace` at the beginning of **block 2**.
+Do not search for special keyboard shortcuts. Think as you would edit plain text.
+Just use the cursor keys to move between the blocks.
+And to merge **block 1** and **block 2**, press `del` at the end of **block 1** or `backspace` at the beginning of **block 2**.
 You would do the same in a plain text or markdown document.
 
-**But wait: **
-There is a little difference.
-If you want to edit the next block, press the key `down`.
-As you will see, the cursor will first move to the end of the block if the cursor was not at the end of the block before.
-If you then press `down` a second time you will move to the next block. 
-	
-	
+
 ## Keyboard Shortcuts
 
-|Shortcut|Description
-|-|-
-|`Esc`|Stop editing
-|`Ctrl + Down`|Edit the next block
-|`Ctrl + Up`|Edit the previous block
+|Shortcut|Description|
+|-|-|
+|`Esc`|Stop editing|
 
 
 ## Usage
 
 Get the code here:
-[https://github.com/McSodbrenner/markdown-inline-editor](https://github.com/McSodbrenner/markdown-inline-editor)
+&lt;https://github.com/McSodbrenner/markdown-inline-editor&gt;
 
-	
+
 First we need a library that renders the markdown. We are using [marked](https://github.com/chjj/marked) here:
 
 ```
-&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.js">&lt;/script>
+&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.6/marked.min.js">&lt;/script>
 ```
 
 Then we have to include the markdown-inline-editor and create an instance of it:
-	
-	&lt;script src="src/editor.js">&lt;/script>
-	&lt;script>
-	
-`view` is the element we want to render the editor into:
 
-		var view     = document.querySelector('.markdown');
-	
-`content` is the markdown text we want to edit
-	
-		var content  = view.textContent;
-	
-The third parameter is a callback that has to return the rendered text:
+```
+&lt;script src="src/editor.js">&lt;/script>
+&lt;script>
+// 'view' is the element we want to render the editor into
+var view     = document.querySelector('.markdown');
 
-		var editor = new Editor(content, view, function(markdown) {
-			return marked(markdown);
-		});
-	&lt;/script>	
+// 'content' is the markdown text we want to edit
+var content  = view.textContent;
+
+// The third parameter is a callback that has to render a given markdown text
+var editor = new Editor(content, view, function(markdown) {
+	return marked(markdown);
+});
+&lt;/script>
+```
 
 ## API
 
-if you init the editor you get the API back.
+If you init the editor you get the API back:
+
 ```
 var editor = new Editor(content, view, ...
 ```
-	
+
 |Method|Description
 |-|-
 |`editor.getMarkdown()`|Returns the complete raw markdown text. Useful, if you want to save the text after editing. :)
 
-	
-	
+
+
 # Markdown test suite
 
 This note demonstrates some of what [Markdown][1] is capable of doing.
@@ -176,14 +209,14 @@ There's actually a lot more to Markdown than this. See the official [introductio
 |        |  not easy being.
 </article>
 
-<script src="marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.6/marked.min.js"></script>
 <script>
 	// initialize marked markdown renderer
 	marked.setOptions({
 		renderer: new marked.Renderer(),
 		gfm: true,
 		tables: true,
-		breaks: false,
+		breaks: true,
 		pedantic: true,
 		sanitize: false,
 		smartLists: true,
@@ -195,8 +228,8 @@ There's actually a lot more to Markdown than this. See the official [introductio
 <script>
 	var view		= document.querySelector('.markdown');
 	var content		= view.textContent;
-	
-	var editor		= new Editor(content, view, function(markdown) {
+
+	var editor		= new Editor(view, content, function(markdown) {
 		return marked(markdown);
 	});
 </script>

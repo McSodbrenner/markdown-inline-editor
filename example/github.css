@@ -1,0 +1,58 @@
+html { font-size: 18px; }
+body { margin: 0; padding: 0; background: #fff; color: #333; font: normal 16px/24px -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; }
+.markdown { width: 720px; max-width: 100%; margin: 0 auto; padding: 3rem; border: 1px solid #ddd; border-radius: 3px; }
+
+.markdown strong { font-weight: 600; }
+.markdown img { border: 0; max-width: 100%; }
+
+.markdown table { width: 100%; overflow: auto; word-break: normal; word-break: keep-all; margin: 1rem 0; border-collapse: collapse; border-spacing: 0; }
+.markdown td,
+.markdown th { padding: 6px 13px; border: 1px solid #dddddd; }
+.markdown th { font-weight: 600; }
+.markdown td:first-child { white-space: nowrap; width: 1%; }
+.markdown tr:nth-child(2n) { background: #f8f8f8; }
+
+.markdown a { color: #4078c0; text-decoration: none; }
+.markdown a:hover,
+.markdown a:active { text-decoration: underline; }
+
+.markdown hr { height: 4px; padding: 0; margin: 1rem 0; background: #e7e7e7; border: 0 none; }
+.markdown hr:before { display: table; content: ""; }
+.markdown hr:after { display: table; clear: both; content: ""; }
+
+.markdown p { margin: 1rem 0; }
+
+.markdown h1, .markdown .h1 { margin: 24px 0 16px; line-height: 140%; font-size: 32px; line-height: 40px; font-weight: 600; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+.markdown h2, .markdown .h2 { margin: 24px 0 16px; line-height: 140%; font-size: 24px; line-height: 30px; font-weight: 600; padding-bottom: 7px; border-bottom: 1px solid #eee; }
+.markdown h3, .markdown .h3 { margin: 24px 0 16px; line-height: 140%; font-size: 20px; line-height: 25px; font-weight: 600; }
+.markdown h4, .markdown .h4 { margin: 24px 0 16px; line-height: 140%; font-size: 16px; line-height: 20px; font-weight: 600; }
+.markdown h5, .markdown .h5 { margin: 24px 0 16px; line-height: 140%; font-size: 14px; line-height: 18px; font-weight: 600; }
+.markdown h6, .markdown .h6 { margin: 24px 0 16px; line-height: 140%; font-size: 13px; line-height: 17px; font-weight: 600; color: #777; }
+
+.markdown blockquote { position: relative; padding: 0 16px; border-left: 4px solid #ddd; color: #777; margin: 0; }
+.markdown blockquote>:first-child { margin-top: 0; }
+.markdown blockquote>:last-child { margin-bottom: 0; }
+
+.markdown ul,
+.markdown ol { padding: 0; margin: 1em 0; padding-left: 32px; }
+.markdown ol ol,
+.markdown ul ol { list-style-type: lower-roman; }
+.markdown ul ul ol,
+.markdown ul ol ol,
+.markdown ol ul ol,
+.markdown ol ol ol { list-style-type: lower-alpha; }
+.markdown li > p { margin-top: 1rem; }
+
+.markdown dl { margin: 1rem 0; padding: 0; }
+.markdown dl dt { padding: 0; margin-top: 1rem; font-style: italic; font-weight: 600; }
+.markdown dl dd { padding: 0 1rem; margin: 0 0 1rem; }
+
+.markdown code { font: 14px/20px Consolas, "Liberation Mono", Menlo, Courier, monospace; padding: 3px 5px; margin: 0; background: rgba(0,0,0,0.04); border-radius: 3px; }
+.markdown pre, .markdown .pre { margin: 1rem 0; font: 14px/20px Consolas, "Liberation Mono", Menlo, Courier, monospace; padding: 1rem; background: #f7f7f7; color: #333; overflow: auto; border-radius: 3px; }
+.markdown pre code { background: 0; padding: 0; white-space: pre-wrap; }
+
+.markdown > div:first-child,
+.markdown > div:first-child > *:first-child { margin-top: 0 !important; }
+
+.markdown > div:not([contenteditable]):hover { outline: 3px solid rgba(0,100,255,.1); outline-offset: 3px; }
+.markdown > div:focus { outline: 3px solid rgba(0,100,255,.3); outline-offset: 3px; }

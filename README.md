@@ -5,6 +5,9 @@ A new approach of editing markdown text with the preview and the editing area co
 See a live preview and the docs of the current master branch here:  
 [http://rawgit.com/McSodbrenner/markdown-inline-editor/master/example/index.htm](http://rawgit.com/McSodbrenner/markdown-inline-editor/master/example/index.htm)
 
+## Todo
+* To allow copy-and-paste of large blocks of text, we need a edit-all-view
+
 ## Screenshot
-![markdow-inline-editor](http://j88.imgup.net/markdown-sde7f.png "")
+![markdow-inline-editor](https://i71i.imgup.net/markdownfw20c7.png "")
 
