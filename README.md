@@ -9,5 +9,5 @@ See a live preview and the docs of the current master branch here:
 * To allow copy-and-paste of large blocks of text, we need a edit-all-view
 
 ## Screenshot
-![markdow-inline-editor](https://i71i.imgup.net/markdownfw20c7.png "")
+![markdow-inline-editor](https://h72.imgup.net/markdownfw0104.png "")
 
